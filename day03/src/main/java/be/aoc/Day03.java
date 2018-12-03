@@ -2,8 +2,11 @@ package be.aoc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.parseInt;
 import static java.nio.file.Files.lines;
 import static java.util.stream.Collectors.toList;
@@ -12,46 +15,46 @@ public class Day03 {
 
     public static void main(String[] args) throws Exception {
         final Path path = Paths.get(Day03.class.getClassLoader().getResource("input.txt").toURI());
-        final List<Claim> claims = lines(path)
-                .map(input -> Claim.fromString(input))
+
+        final List<String> lines = lines(path)
+                .map(String::new)
                 .collect(toList());
 
-        System.out.println(claims);
-    }
-}
+        final Map<Integer, Map<Integer, Integer>> map = new HashMap<>();
+        final Map<Integer, Boolean> intact = new HashMap<>();
 
-class Claim {
-    private final String id;
-    private final int leftEdge;
-    private final int topEdge;
-    private final int wide;
-    private final int tall;
+        lines.forEach(str -> {
+            String[] claim = str.replace(":", "").split(" ");
+            int id = parseInt(claim[0].replace("#", ""));
+            String[] coord = claim[2].split(",");
+            String[] size = claim[3].split("x");
+            for (int x = 0; x < parseInt(size[0]); x++) {
+                for (int y = 0; y < parseInt(size[1]); y++) {
+                    int coordX = parseInt(coord[0]) + x;
+                    int coordY = parseInt(coord[1]) + y;
+                    Map<Integer, Integer> m = map.computeIfAbsent(coordX, k -> new HashMap<>());
+                    Integer integer = m.get(coordY);
+                    if (integer == null) {
+                        m.put(coordY, id);
+                        intact.putIfAbsent(id, true);
+                    } else {
+                        m.put(coordY, -1);
+                        intact.put(integer, false);
+                        intact.put(id, false);
+                    }
+                }
+            }
+        });
 
-    Claim(final String id, final int leftEdge, final int topEdge, final int wide, final int tall) {
-        this.id = id;
-        this.leftEdge = leftEdge;
-        this.topEdge = topEdge;
-        this.wide = wide;
-        this.tall = tall;
-    }
+        //print part 1
+        System.out.println(map.values().stream()
+                .flatMap(v -> v.values().stream())
+                .filter(v -> v == -1)
+                .count());
+        //print part 2
+        intact.entrySet().stream()
+                .filter(e -> e.getValue() == TRUE)
+                .forEach(System.out::println);
 
-    static Claim fromString(final String input) {
-        final String id = input.substring(1, input.indexOf('@') - 1);
-        final int leftEdge = parseInt(input.substring(input.indexOf('@') + 1, input.indexOf(",")).trim());
-        final int topEdge = parseInt(input.substring(input.indexOf(',') + 1, input.indexOf(":")).trim());
-        final int wide = parseInt(input.substring(input.indexOf(':') + 1, input.indexOf("x")).trim());
-        final int tall = parseInt(input.substring(input.indexOf('x') + 1).trim());
-        return new Claim(id, leftEdge, topEdge, wide, tall);
-    }
-
-    @Override
-    public String toString() {
-        return "Claim{" +
-                "id='" + id + '\'' +
-                ", leftEdge=" + leftEdge +
-                ", topEdge=" + topEdge +
-                ", wide=" + wide +
-                ", tall=" + tall +
-                '}';
     }
 }
