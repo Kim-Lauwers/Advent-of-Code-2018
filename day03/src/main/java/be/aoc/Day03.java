@@ -23,17 +23,17 @@ public class Day03 {
         final Map<Integer, Map<Integer, Integer>> map = new HashMap<>();
         final Map<Integer, Boolean> intact = new HashMap<>();
 
-        lines.forEach(str -> {
-            String[] claim = str.replace(":", "").split(" ");
-            int id = parseInt(claim[0].replace("#", ""));
+        lines.forEach(inputString -> {
+            final String[] claim = inputString.replace(":", "").split(" ");
+            final int id = parseInt(claim[0].replace("#", ""));
             String[] coord = claim[2].split(",");
             String[] size = claim[3].split("x");
             for (int x = 0; x < parseInt(size[0]); x++) {
                 for (int y = 0; y < parseInt(size[1]); y++) {
                     int coordX = parseInt(coord[0]) + x;
                     int coordY = parseInt(coord[1]) + y;
-                    Map<Integer, Integer> m = map.computeIfAbsent(coordX, k -> new HashMap<>());
-                    Integer integer = m.get(coordY);
+                    final Map<Integer, Integer> m = map.computeIfAbsent(coordX, k -> new HashMap<>());
+                    final Integer integer = m.get(coordY);
                     if (integer == null) {
                         m.put(coordY, id);
                         intact.putIfAbsent(id, true);
@@ -51,6 +51,7 @@ public class Day03 {
                 .flatMap(v -> v.values().stream())
                 .filter(v -> v == -1)
                 .count());
+
         //print part 2
         intact.entrySet().stream()
                 .filter(e -> e.getValue() == TRUE)
