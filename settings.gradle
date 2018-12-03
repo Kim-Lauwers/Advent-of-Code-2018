@@ -1,3 +1,4 @@
 rootProject.name = 'Advent-of-Code-2018'
 include 'day01'
 include 'day02'
+include 'day03'
